@@ -7,6 +7,9 @@ import os
 from django.utils.translation import ugettext_lazy as _
 
 
+MEDIA_URL = getattr(settings, 'MEDIA_URL', '')
+
+
 def image_upload(request):
     if 'file' in request.FILES:
         the_file = request.FILES['file']
@@ -18,7 +21,6 @@ def image_upload(request):
         # filesize = len(file['content'])
         # filetype = file['content-type']
         upload_to = getattr(settings, 'FROALA_UPLOAD_PATH', 'uploads/froala_editor/images/')
-        MEDIA_URL = getattr(settings, 'MEDIA_URL', '')
         path = default_storage.save(os.path.join(upload_to, the_file.name), the_file)
         host = request.META['HTTP_ORIGIN']
         link = "%s%s%s" % (host, MEDIA_URL, the_file)
@@ -31,5 +33,6 @@ def file_upload(request):
         the_file = request.FILES['file']
         upload_to = getattr(settings, 'FROALA_UPLOAD_PATH', 'uploads/froala_editor/files/')
         path = default_storage.save(os.path.join(upload_to, the_file.name), the_file)
-        link = default_storage.url(path)
+        host = request.META['HTTP_ORIGIN']
+        link = "%s%s%s" % (host, MEDIA_URL, the_file)
         return HttpResponse(json.dumps({'link': link}), content_type="application/json")
